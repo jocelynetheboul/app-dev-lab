@@ -14,15 +14,24 @@ spec:
       labels:
 # set your lab user name
         app: {{ .Release.Name }}
+        spec:
+        volumes:
+          - name: index-html
+            configMap:
+              name: index.html
+              defaultMode: 420
     spec:
       containers:
-        - resources: {}
-          terminationMessagePath: /dev/termination-log
-          name: {{ .Release.Name }}
-          ports:
+        volumeMounts:
+          - name: index-html
+            mountPath: /tmp/html # this will mount the html.index file to it application location
+          - resources: {}
+            terminationMessagePath: /dev/termination-log
+            name: {{ .Release.Name }}
+            ports:
             - containerPort: {{ .Values.containers.containerPort }}
               protocol: TCP
-          imagePullPolicy: IfNotPresent
+            imagePullPolicy: IfNotPresent
 # update with the image you build in part 1
           image: {{ .Values.containers.image }}:{{ .Values.containers.tag }}
       restartPolicy: Always
@@ -33,3 +42,4 @@ spec:
       maxUnavailable: 25%
       maxSurge: 25%
   revisionHistoryLimit: 10
+  
